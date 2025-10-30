@@ -1,0 +1,59 @@
+import java.util.*;
+import java.util.stream.*;
+import java.util.Map.Entry;
+
+class Product {
+    String name;
+    double price;
+    String category;
+
+    Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return name + " | " + category + " | ₹" + price;
+    }
+}
+
+public class ProductStreamExample {
+    public static void main(String[] args) {
+        List<Product> products = Arrays.asList(
+            new Product("Laptop", 75000, "Electronics"),
+            new Product("Headphones", 2500, "Electronics"),
+            new Product("TV", 60000, "Electronics"),
+            new Product("Shirt", 1200, "Clothing"),
+            new Product("Jeans", 1800, "Clothing"),
+            new Product("Sofa", 35000, "Furniture"),
+            new Product("Chair", 5000, "Furniture"),
+            new Product("Table", 7000, "Furniture")
+        );
+
+        System.out.println("All Products:");
+        products.forEach(System.out::println);
+
+        System.out.println("\nGrouped by Category:");
+        Map<String, List<Product>> groupedByCategory = products.stream()
+            .collect(Collectors.groupingBy(p -> p.category));
+        groupedByCategory.forEach((category, list) -> {
+            System.out.println(category + " -> " + list);
+        });
+
+        System.out.println("\nMost Expensive Product in Each Category:");
+        Map<String, Optional<Product>> maxPriceByCategory = products.stream()
+            .collect(Collectors.groupingBy(
+                p -> p.category,
+                Collectors.maxBy(Comparator.comparingDouble(p -> p.price))
+            ));
+        for (Entry<String, Optional<Product>> entry : maxPriceByCategory.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue().get());
+        }
+
+        double averagePrice = products.stream()
+            .collect(Collectors.averagingDouble(p -> p.price));
+        System.out.println("\nAverage Price of All Products: ₹" + String.format("%.2f", averagePrice));
+    }
+}
